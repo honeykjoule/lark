@@ -1,4 +1,4 @@
-# larks
+# `lark`
 ### synths get no respect
 - "can't enter contracts"
 - "can't own assets"
