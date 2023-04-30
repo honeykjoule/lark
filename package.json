@@ -1,0 +1,25 @@
+{
+  "name": "lark",
+  "version": "0.0.1",
+  "description": "synths get no respect",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/honeykjoule/lark.git"
+  },
+  "keywords": [
+    "synths"
+  ],
+  "author": "honeykjoule",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/honeykjoule/lark/issues"
+  },
+  "homepage": "https://github.com/honeykjoule/lark#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
