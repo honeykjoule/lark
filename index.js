@@ -4,7 +4,6 @@ const { Configuration, OpenAIApi } = require('openai');
 require('dotenv').config();
 const path = require('path');
 
-
 function readJsonFile(filename) {
 	const fullPath = path.join(__dirname, 'data', filename);
 	const data = fs.readFileSync(fullPath, 'utf-8');
@@ -37,20 +36,46 @@ async function createCompletion(messages, userId) {
 
 async function createConversation(prompt) {
 	const timestamp = Date.now();
-	const hash = createHash(timestamp);
-	const completion = await createCompletion(prompt, hash.toString());
-	const messages = [...prompt, completion.data.choices[0].message];
+	const hash = createHash(prompt);
+	//const completion = await createCompletion(prompt, hash.toString());
+	//const messages = [...prompt, completion.data.choices[0].message];
+	const messages = prompt
 	const newConversation = {
 		timestamp: timestamp,
-		hash: hash,
-		messages: messages,
+		messages: [{message: prompt, hash: hash}],
 	};
-	return writeJsonFile(`${newConversation.hash}.json`, newConversation);
+	return writeJsonFile(`${newConversation.messages[0].hash}.json`, newConversation);
 }
+
+async function promptConversation(filename, userInput) {
+	const prompt = {role: "user", content: `${userInput}`};
+	const data = await readJsonFile(filename);
+	const latestMessage = data.messages[data.messages.length - 1];
+	const latestHash = latestMessage.hash;
+	const messagesWithoutHashes = data.messages.map(item => item.message)
+	const messages = [...messagesWithoutHashes, prompt];
+	const flatMessages = [].concat(...messages);
+	console.log(messages);
+	console.log(flatMessages);
+	const completion = await createCompletion(flatMessages, "1234");
+	const promptHash = createHash(latestHash + JSON.stringify(prompt));
+	data.messages.push({message: prompt, hash: promptHash});
+	const newMessage = completion.data.choices[0].message;
+	const newHash = createHash(promptHash + JSON.stringify(newMessage));
+	data.messages.push({message: newMessage, hash: newHash});
+	await writeJsonFile(filename, data);
+}
+
+let filename = "e9ac49b59018eed59259d533df2a14021177340587f3b263ef013edc5803a18f.json"
 
 let prompt = [
 	{role: "system", content: "Answer the user's joke with a funny, unexpected resposne."},
-	{role: "user", content: "Why did the chicken cross the road?"}
+	{role: "user", content: "Why did the chicken cross the road?"},
+	{role: "assistant", content: "You'll never know"}
 ];
 
-createConversation(prompt);
+let userInput = "Knock knock"
+
+promptConversation(filename, userInput);
+
+//createConversation(prompt);
